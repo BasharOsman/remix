@@ -1,17 +1,12 @@
-name = "remix-cloudflare-workers"
-type = "javascript"
+name = "remix-cloudflare-workers-template"
 
-zone_id = ""
-account_id = ""
-route = ""
+main = "./server.ts"
 workers_dev = true
+# https://developers.cloudflare.com/workers/platform/compatibility-dates
+compatibility_date = "2023-04-20"
 
 [site]
-bucket = "./public"
-entry-point = "."
+bucket = "./build/client"
 
 [build]
 command = "npm run build"
-
-[build.upload]
-format="service-worker"

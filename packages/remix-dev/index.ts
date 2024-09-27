@@ -1,8 +1,15 @@
 import "./modules";
 
-export type { AppConfig } from "./config";
+export type { AppConfig, RemixConfig as ResolvedRemixConfig } from "./config";
 
 export * as cli from "./cli/index";
-export { createApp } from "./cli/create";
 
-export { getDependenciesToBundle } from "./compiler/dependencies";
+export type { Manifest as AssetsManifest } from "./manifest";
+export { getDependenciesToBundle } from "./dependencies";
+export type {
+  BuildManifest,
+  Preset,
+  ServerBundlesFunction,
+  VitePluginConfig,
+} from "./vite";
+export { vitePlugin, cloudflareDevProxyVitePlugin } from "./vite";

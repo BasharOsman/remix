@@ -1,7 +1,9 @@
-import { createFixture, js } from "./helpers/create-fixture";
-import type { Fixture } from "./helpers/create-fixture";
+import { test, expect } from "@playwright/test";
 
-describe("rendering", () => {
+import { createFixture, js } from "./helpers/create-fixture.js";
+import type { Fixture } from "./helpers/create-fixture.js";
+
+test.describe("rendering", () => {
   let fixture: Fixture;
 
   let ROOT_$ = "FLAT";
@@ -12,44 +14,48 @@ describe("rendering", () => {
   let NESTED_INDEX = "NESTED_INDEX";
   let PARENTLESS_$ = "PARENTLESS_$";
 
-  beforeAll(async () => {
+  test.beforeAll(async () => {
     fixture = await createFixture({
       files: {
-        "app/root.jsx": js`
-          import { Outlet, Scripts } from "remix";
+        "app/root.tsx": js`
+          import { Links, Meta, Outlet, Scripts } from "@remix-run/react";
+
           export default function Root() {
             return (
-              <html>
-                <head />
+              <html lang="en">
+                <head>
+                  <Meta />
+                  <Links />
+                </head>
                 <body>
                   <Outlet />
                   <Scripts />
                 </body>
               </html>
-            )
+            );
           }
         `,
 
-        "app/routes/index.jsx": js`
+        "app/routes/_index.tsx": js`
           export default function() {
             return <h2>${ROOT_INDEX}</h2>;
           }
         `,
 
-        "app/routes/$.jsx": js`
+        "app/routes/$.tsx": js`
           export default function() {
             return <h2>${ROOT_$}</h2>;
           }
         `,
 
-        "app/routes/flat.$.jsx": js`
+        "app/routes/flat.$.tsx": js`
           export default function() {
             return <h2>${FLAT_$}</h2>
           }
         `,
 
-        "app/routes/nested.jsx": js`
-          import { Outlet } from "remix";
+        "app/routes/nested.tsx": js`
+          import { Outlet } from "@remix-run/react";
           export default function() {
             return (
               <div>
@@ -60,19 +66,19 @@ describe("rendering", () => {
           }
         `,
 
-        "app/routes/nested/$.jsx": js`
+        "app/routes/nested.$.tsx": js`
           export default function() {
             return <h2>${NESTED_$}</h2>
           }
         `,
 
-        "app/routes/nested/index.jsx": js`
+        "app/routes/nested._index.tsx": js`
           export default function() {
             return <h2>${NESTED_INDEX}</h2>
           }
         `,
 
-        "app/routes/parentless/$.jsx": js`
+        "app/routes/parentless.$.tsx": js`
           export default function() {
             return <h2>${PARENTLESS_$}</h2>
           }
@@ -91,17 +97,17 @@ describe("rendering", () => {
     expect(await res.text()).toMatch(FLAT_$);
   });
 
-  it("prioritizes index over root splat", async () => {
+  test("prioritizes index over root splat", async () => {
     let res = await fixture.requestDocument("/");
     expect(await res.text()).toMatch(ROOT_INDEX);
   });
 
-  it("matches root splat", async () => {
+  test("matches root splat", async () => {
     let res = await fixture.requestDocument("/twisted/sugar");
     expect(await res.text()).toMatch(ROOT_$);
   });
 
-  it("prioritizes index over splat for parent route match", async () => {
+  test("prioritizes index over splat for parent route match", async () => {
     let res = await fixture.requestDocument("/nested");
     expect(await res.text()).toMatch(NESTED_INDEX);
   });

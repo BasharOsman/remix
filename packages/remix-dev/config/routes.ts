@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from "node:path";
 
 /**
  * A route that was created using `defineRoutes` or created conventionally from
@@ -22,7 +22,7 @@ export interface ConfigRoute {
 
   /**
    * The unique id for this route, named like its `file` but without the
-   * extension. So `app/routes/gists/$username.jsx` will have an `id` of
+   * extension. So `app/routes/gists/$username.tsx` will have an `id` of
    * `routes/gists/$username`.
    */
   id: string;
@@ -54,6 +54,12 @@ export interface DefineRouteOptions {
    * Should be `true` if this is an index route that does not allow child routes.
    */
   index?: boolean;
+
+  /**
+   * An optional unique id string for this route. Use this if you need to aggregate
+   * two or more routes with the same route file.
+   */
+  id?: string;
 }
 
 interface DefineRouteChildren {
@@ -141,13 +147,19 @@ export function defineRoutes(
       path: path ? path : undefined,
       index: options.index ? true : undefined,
       caseSensitive: options.caseSensitive ? true : undefined,
-      id: createRouteId(file),
+      id: options.id || createRouteId(file),
       parentId:
         parentRoutes.length > 0
           ? parentRoutes[parentRoutes.length - 1].id
-          : undefined,
+          : "root",
       file,
     };
+
+    if (route.id in routes) {
+      throw new Error(
+        `Unable to define routes with duplicate route id: "${route.id}"`
+      );
+    }
 
     routes[route.id] = route;
 

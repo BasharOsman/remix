@@ -1,11 +1,13 @@
-import { cli } from "@remix-run/dev";
+import process from "node:process";
 
-cli.run(["create", ...process.argv.slice(2)]).then(
-  () => {
-    process.exit(0);
-  },
-  (error: Error) => {
-    console.error(error);
-    process.exit(1);
-  }
+import { createRemix } from "./index";
+
+process.on("SIGINT", () => process.exit(0));
+process.on("SIGTERM", () => process.exit(0));
+
+let argv = process.argv.slice(2).filter((arg) => arg !== "--");
+
+createRemix(argv).then(
+  () => process.exit(0),
+  () => process.exit(1)
 );
